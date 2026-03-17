@@ -37,6 +37,7 @@ const ui = createUI();
 function startBoss() {
   boss = createBoss(scene, state.level - 1);
   state.phase = PHASE.BOSS_FIGHT;
+  prevBossPhase = 0;
   document.getElementById('boss-bar-container').style.display = 'block';
 }
 

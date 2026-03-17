@@ -23,7 +23,7 @@ function playTone({ freq = 440, type = 'square', duration = 0.1, gain = 0.3, fre
 
 function playNoise(duration = 0.1, gain = 0.2, freqLow = 100, freqHigh = 2000) {
   const c = getCtx();
-  const bufSize = c.sampleRate * duration;
+  const bufSize = Math.ceil(c.sampleRate * duration);
   const buf = c.createBuffer(1, bufSize, c.sampleRate);
   const data = buf.getChannelData(0);
   for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
