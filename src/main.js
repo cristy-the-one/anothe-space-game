@@ -4,6 +4,7 @@ import { createRenderer } from './renderer.js';
 import { setupScene, createStarfield } from './scene.js';
 import { createPlayer } from './player.js';
 import { createBulletPool } from './bullets.js';
+import { createEnemyManager } from './enemies.js';
 
 const FIRE_RATE = 0.15;
 
@@ -18,6 +19,17 @@ setupScene(scene);
 const starfield = createStarfield(scene);
 const player = createPlayer(scene);
 const bullets = createBulletPool(scene);
+const enemies = createEnemyManager(scene);
+
+// Temporary: spawn a few enemies to test
+setTimeout(() => {
+  if (state.phase === PHASE.PLAYING || state.phase === PHASE.BOSS_FIGHT) {
+    enemies.spawn('grunt',  -3, 1);
+    enemies.spawn('weaver',  0, 0);
+    enemies.spawn('shooter', 3, -1);
+    enemies.spawn('kamikaze', 1, 2);
+  }
+}, 2000);
 
 let lastTime = performance.now();
 function loop(now) {
@@ -45,6 +57,9 @@ function loop(now) {
         bullets.spawnPlayerBullet(px, py);
       }
     }
+
+    enemies.update(dt, player.mesh.position.x, player.mesh.position.y,
+      (ex, ey, px, py) => bullets.spawnEnemyBullet(ex, ey, px, py));
   }
 
   composer.render();
