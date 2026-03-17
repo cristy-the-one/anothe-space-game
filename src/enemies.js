@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { state } from './state.js';
 
 const MESHES = {
   grunt:    () => new THREE.Mesh(new THREE.BoxGeometry(0.8,0.8,0.8), new THREE.MeshLambertMaterial({color:0xff4422})),
@@ -31,11 +32,12 @@ export function createEnemyManager(scene) {
     remove,
 
     update(dt, playerX, playerY, onShoot) {
+      const levelSpeed = 12 + (state.level - 1) * 3; // +3 per level: L1=12, L2=15, L3=18
       for (let i = active.length - 1; i >= 0; i--) {
         const e = active[i];
         e.age += dt;
         e.mesh.rotation.y += dt * 1.5;
-        e.mesh.position.z += 12 * dt; // fly toward player
+        e.mesh.position.z += levelSpeed * dt; // fly toward player
 
         switch (e.type) {
           case 'grunt':
