@@ -2,10 +2,10 @@ import * as THREE from 'three';
 import { state } from './state.js';
 
 const MESHES = {
-  grunt:    () => new THREE.Mesh(new THREE.BoxGeometry(0.8,0.8,0.8), new THREE.MeshLambertMaterial({color:0xff4422})),
-  weaver:   () => new THREE.Mesh(new THREE.OctahedronGeometry(0.6),  new THREE.MeshLambertMaterial({color:0xff8800})),
-  shooter:  () => new THREE.Mesh(new THREE.DodecahedronGeometry(0.6),new THREE.MeshLambertMaterial({color:0xff2288})),
-  kamikaze: () => new THREE.Mesh(new THREE.TetrahedronGeometry(0.7), new THREE.MeshLambertMaterial({color:0xff0000})),
+  grunt:    () => new THREE.Mesh(new THREE.BoxGeometry(0.8,0.8,0.8), new THREE.MeshBasicMaterial({color:0xffaa44, wireframe:true})),
+  weaver:   () => new THREE.Mesh(new THREE.OctahedronGeometry(0.6),  new THREE.MeshBasicMaterial({color:0xffff44, wireframe:true})),
+  shooter:  () => new THREE.Mesh(new THREE.DodecahedronGeometry(0.6),new THREE.MeshBasicMaterial({color:0xff44cc, wireframe:true})),
+  kamikaze: () => new THREE.Mesh(new THREE.TetrahedronGeometry(0.7), new THREE.MeshBasicMaterial({color:0xff4444, wireframe:true})),
 };
 
 export function createEnemyManager(scene) {
