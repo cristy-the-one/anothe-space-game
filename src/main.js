@@ -12,6 +12,7 @@ import { aabbOverlap } from './collision.js';
 import { addKill, resetStreak } from './score.js';
 import { createBoss } from './boss.js';
 import { createUI } from './ui.js';
+import { audio } from './audio.js';
 
 const FIRE_RATE = 0.15;
 
@@ -39,6 +40,8 @@ function startBoss() {
   document.getElementById('boss-bar-container').style.display = 'block';
 }
 
+let prevBossPhase = 0;
+
 let lastTime = performance.now();
 function loop(now) {
   requestAnimationFrame(loop);
@@ -56,6 +59,7 @@ function loop(now) {
     if (player.shooting.active && player.shootCooldown <= 0) {
       const fireRate = FIRE_RATE / (state.activePowerUps.rapidFire ? 2 : 1);
       player.shootCooldown = fireRate;
+      audio.shoot();
       const px = player.mesh.position.x, py = player.mesh.position.y;
       if (state.activePowerUps.spreadShot) {
         bullets.spawnPlayerBullet(px, py, -0.3);
@@ -85,6 +89,9 @@ function loop(now) {
       boss.update(dt, player.mesh.position.x, player.mesh.position.y,
         (ex, ey, px, py) => bullets.spawnEnemyBullet(ex, ey, px, py));
 
+      const curPhase = boss ? Math.floor((1 - boss.hpFraction) / 0.34) : 0;
+      if (boss && curPhase !== prevBossPhase) { prevBossPhase = curPhase; audio.bossPhase(); }
+
       // Update boss health bar
       document.getElementById('boss-bar-fill').style.width = (boss.hpFraction * 100) + '%';
 
@@ -97,6 +104,7 @@ function loop(now) {
           bullets.recycleBullet(b);
           if (!boss.alive) {
             addKill('boss', Date.now());
+            audio.explodeLarge();
             const { x: bossX, y: bossY } = boss.getBBox();
             particles.explode(bossX, bossY, -25, 40, 0xff4400);
             document.getElementById('boss-bar-container').style.display = 'none';
@@ -119,6 +127,7 @@ function loop(now) {
       if (boss && aabbOverlap(boss.getBBox(), player.getBBox())) {
         if (player.takeDamage()) {
           resetStreak();
+          audio.playerHit();
           particles.explode(player.mesh.position.x, player.mesh.position.y, 0, 12, 0xffffff);
           if (state.lives === 0) {
             state.phase = PHASE.GAME_OVER;
@@ -143,6 +152,7 @@ function loop(now) {
           bullets.recycleBullet(b);
           if (e.hp <= 0) {
             addKill(e.type, Date.now());
+            audio.explodeSmall();
             particles.explode(e.mesh.position.x, e.mesh.position.y, e.mesh.position.z, 8, 0xff6600);
             powerups.trySpawn(e.mesh.position.x, e.mesh.position.y, e.mesh.position.z);
             enemies.remove(e);
@@ -161,6 +171,7 @@ function loop(now) {
         bullets.recycleBullet(b);
         if (player.takeDamage()) {
           resetStreak();
+          audio.playerHit();
           particles.explode(player.mesh.position.x, player.mesh.position.y, 0, 12, 0xffffff);
           if (state.lives === 0) {
             state.phase = PHASE.GAME_OVER;
@@ -179,6 +190,7 @@ function loop(now) {
         enemies.remove(e);
         if (player.takeDamage()) {
           resetStreak();
+          audio.playerHit();
           particles.explode(player.mesh.position.x, player.mesh.position.y, 0, 12, 0xffffff);
           if (state.lives === 0) {
             state.phase = PHASE.GAME_OVER;
@@ -194,8 +206,8 @@ function loop(now) {
     // Player collects power-up
     for (let i = powerups.active.length - 1; i >= 0; i--) {
       if (aabbOverlap(powerups.getBBox(powerups.active[i]), playerBB)) {
+        audio.powerUp();
         powerups.collect(powerups.active[i]);
-        // TODO: play power-up sound (Task 14)
       }
     }
   }
