@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tests</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #111; color: #eee; }
+    .pass { color: #00ff41; } .fail { color: #ff4444; }
+    h2 { color: #aaa; margin: 16px 0 8px; }
+  </style>
+</head>
+<body>
+  <h1>Test Results</h1>
+  <div id="results"></div>
+  <script type="module">
+    import './collision.test.js';
+    import './score.test.js';
+  </script>
+  <script type="module">
+    // Simple assert helper — imported by test files via window
+    window.assert = function(description, condition) {
+      const el = document.createElement('div');
+      el.className = condition ? 'pass' : 'fail';
+      el.textContent = (condition ? '✓ ' : '✗ ') + description;
+      document.getElementById('results').appendChild(el);
+      if (!condition) console.error('FAIL:', description);
+    };
+    window.describe = function(name) {
+      const el = document.createElement('h2');
+      el.textContent = name;
+      document.getElementById('results').appendChild(el);
+    };
+  </script>
+</body>
+</html>
