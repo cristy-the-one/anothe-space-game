@@ -7,6 +7,7 @@ import { createBulletPool } from './bullets.js';
 import { createEnemyManager } from './enemies.js';
 import { createParticleSystem } from './particles.js';
 import { createPowerUpManager } from './powerups.js';
+import { createWaveSequencer } from './levels.js';
 import { aabbOverlap } from './collision.js';
 import { addKill, resetStreak } from './score.js';
 
@@ -26,16 +27,7 @@ const bullets = createBulletPool(scene);
 const enemies = createEnemyManager(scene);
 const particles = createParticleSystem(scene);
 const powerups = createPowerUpManager(scene);
-
-// Temporary: spawn a few enemies to test
-setTimeout(() => {
-  if (state.phase === PHASE.PLAYING || state.phase === PHASE.BOSS_FIGHT) {
-    enemies.spawn('grunt',  -3, 1);
-    enemies.spawn('weaver',  0, 0);
-    enemies.spawn('shooter', 3, -1);
-    enemies.spawn('kamikaze', 1, 2);
-  }
-}, 2000);
+const sequencer = createWaveSequencer((type, x, y) => enemies.spawn(type, x, y));
 
 let lastTime = performance.now();
 function loop(now) {
@@ -69,6 +61,15 @@ function loop(now) {
 
     particles.update(dt);
     powerups.update(dt);
+
+    // Wave sequencer (PLAYING state only)
+    if (state.phase === PHASE.PLAYING) {
+      const result = sequencer.update(dt, enemies.active.length);
+      if (result === 'wave_clear') {
+        const next = sequencer.nextWave();
+        if (next === 'boss_time') state.phase = PHASE.BOSS_FIGHT;
+      }
+    }
 
     // Player bullets vs enemies
     for (let i = bullets.activeBullets.length - 1; i >= 0; i--) {
