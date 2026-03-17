@@ -13,10 +13,6 @@
   <h1>Test Results</h1>
   <div id="results"></div>
   <script type="module">
-    import './collision.test.js';
-    import './score.test.js';
-  </script>
-  <script type="module">
     // Simple assert helper — imported by test files via window
     window.assert = function(description, condition) {
       const el = document.createElement('div');
@@ -30,6 +26,10 @@
       el.textContent = name;
       document.getElementById('results').appendChild(el);
     };
+  </script>
+  <script type="module">
+    import './collision.test.js';
+    import './score.test.js';
   </script>
 </body>
 </html>
