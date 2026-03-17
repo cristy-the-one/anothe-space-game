@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { state, PHASE, resetForNewGame } from './state.js';
 import { createRenderer } from './renderer.js';
 import { setupScene, createStarfield } from './scene.js';
+import { createPlayer } from './player.js';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -12,6 +13,7 @@ const { composer, crtPass } = createRenderer(scene, camera);
 
 setupScene(scene);
 const starfield = createStarfield(scene);
+const player = createPlayer(scene);
 
 let lastTime = performance.now();
 function loop(now) {
@@ -21,6 +23,10 @@ function loop(now) {
   crtPass.uniforms.time.value = now * 0.001;
 
   starfield.update(dt, 20);
+
+  if (state.phase === 'PLAYING' || state.phase === 'BOSS_FIGHT') {
+    player.update(dt);
+  }
 
   composer.render();
 }
