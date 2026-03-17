@@ -95,7 +95,8 @@ function loop(now) {
           bullets.recycleBullet(b);
           if (!boss.alive) {
             addKill('boss', Date.now());
-            particles.explode(0, 0, -25, 40, 0xff4400);
+            const { x: bossX, y: bossY } = boss.getBBox();
+            particles.explode(bossX, bossY, -25, 40, 0xff4400);
             document.getElementById('boss-bar-container').style.display = 'none';
             boss = null;
             // Level clear
