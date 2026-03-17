@@ -3,6 +3,9 @@ import { state, PHASE, resetForNewGame } from './state.js';
 import { createRenderer } from './renderer.js';
 import { setupScene, createStarfield } from './scene.js';
 import { createPlayer } from './player.js';
+import { createBulletPool } from './bullets.js';
+
+const FIRE_RATE = 0.15;
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -14,6 +17,7 @@ const { composer, crtPass } = createRenderer(scene, camera);
 setupScene(scene);
 const starfield = createStarfield(scene);
 const player = createPlayer(scene);
+const bullets = createBulletPool(scene);
 
 let lastTime = performance.now();
 function loop(now) {
@@ -26,6 +30,21 @@ function loop(now) {
 
   if (state.phase === PHASE.PLAYING || state.phase === PHASE.BOSS_FIGHT) {
     player.update(dt);
+    bullets.update(dt);
+
+    // Player shooting
+    if (player.shooting.active && player.shootCooldown <= 0) {
+      const fireRate = FIRE_RATE / (state.activePowerUps.rapidFire ? 2 : 1);
+      player.shootCooldown = fireRate;
+      const px = player.mesh.position.x, py = player.mesh.position.y;
+      if (state.activePowerUps.spreadShot) {
+        bullets.spawnPlayerBullet(px, py, -0.3);
+        bullets.spawnPlayerBullet(px, py, 0);
+        bullets.spawnPlayerBullet(px, py, 0.3);
+      } else {
+        bullets.spawnPlayerBullet(px, py);
+      }
+    }
   }
 
   composer.render();
