@@ -1,4 +1,4 @@
-import { state, PHASE } from './state.js';
+import { state } from './state.js';
 
 const $ = id => document.getElementById(id);
 
