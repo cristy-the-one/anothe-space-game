@@ -20,6 +20,7 @@ export function createEnemyManager(scene) {
   function remove(enemy) {
     scene.remove(enemy.mesh);
     enemy.mesh.geometry.dispose();
+    enemy.mesh.material.dispose();
     const idx = active.indexOf(enemy);
     if (idx !== -1) active.splice(idx, 1);
   }
@@ -44,16 +45,25 @@ export function createEnemyManager(scene) {
             e.mesh.position.x = e.spawnX + Math.sin(e.age * 2.5) * 3;
             break;
           case 'shooter':
-            // Stop at z=-15, shoot, retreat
-            if (e.mesh.position.z > -15) {
-              e.mesh.position.z = -15;
+            if (e.phase === 0) {
+              // Advance until stopped
+              if (e.mesh.position.z >= -15) {
+                e.mesh.position.z = -15;
+                e.phase = 1; // now stopped
+              }
+            } else if (e.phase === 1) {
+              // Stopped: shoot periodically, then retreat after 4s total age
+              e.mesh.position.z -= 12 * dt; // cancel base advance — stay stopped
               e.phaseTimer += dt;
               if (e.phaseTimer > 1.5) {
                 e.phaseTimer = 0;
                 onShoot(e.mesh.position.x, e.mesh.position.y, playerX, playerY);
               }
+              if (e.age > 4) e.phase = 2;
+            } else if (e.phase === 2) {
+              // Retreat
+              e.mesh.position.z -= (12 + 8) * dt; // cancel base + retreat
             }
-            if (e.age > 4) e.mesh.position.z -= 8 * dt; // retreat
             break;
           case 'kamikaze':
             // Fast dive toward player
@@ -82,6 +92,7 @@ export function createEnemyManager(scene) {
       for (let i = active.length - 1; i >= 0; i--) {
         scene.remove(active[i].mesh);
         active[i].mesh.geometry.dispose();
+        active[i].mesh.material.dispose();
       }
       active.length = 0;
     },
