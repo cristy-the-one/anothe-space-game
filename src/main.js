@@ -120,6 +120,13 @@ function loop(now) {
         if (player.takeDamage()) {
           resetStreak();
           particles.explode(player.mesh.position.x, player.mesh.position.y, 0, 12, 0xffffff);
+          if (state.lives === 0) {
+            state.phase = PHASE.GAME_OVER;
+            ui.showGameOver(false);
+            enemies.clear(); bullets.clear(); powerups.clear(); particles.clear(); boss = null;
+            sequencer.reset(); player.reset();
+            document.getElementById('boss-bar-container').style.display = 'none';
+          }
         }
       }
     }
@@ -158,7 +165,8 @@ function loop(now) {
           if (state.lives === 0) {
             state.phase = PHASE.GAME_OVER;
             ui.showGameOver(false);
-            enemies.clear(); bullets.clear(); powerups.clear(); boss = null;
+            enemies.clear(); bullets.clear(); powerups.clear(); particles.clear(); boss = null;
+            sequencer.reset(); player.reset();
             document.getElementById('boss-bar-container').style.display = 'none';
           }
         }
@@ -175,7 +183,8 @@ function loop(now) {
           if (state.lives === 0) {
             state.phase = PHASE.GAME_OVER;
             ui.showGameOver(false);
-            enemies.clear(); bullets.clear(); powerups.clear(); boss = null;
+            enemies.clear(); bullets.clear(); powerups.clear(); particles.clear(); boss = null;
+            sequencer.reset(); player.reset();
             document.getElementById('boss-bar-container').style.display = 'none';
           }
         }

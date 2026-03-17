@@ -42,7 +42,7 @@ export function createUI() {
 
     showGameOver(victory = false) {
       overlay.classList.remove('hidden');
-      const newHi = state.score >= state.hiScore;
+      const newHi = state.score > 0 && state.score === state.hiScore;
       overlay.innerHTML = `
         <h1 style="font-size:${victory?'20px':'24px'};color:${victory?'#ffff00':'#ff4444'}">${victory ? 'YOU WIN!' : 'GAME OVER'}</h1>
         ${newHi ? '<p style="color:#ffff00">NEW HI-SCORE!</p>' : ''}
