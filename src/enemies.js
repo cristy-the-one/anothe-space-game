@@ -50,8 +50,7 @@ export function createEnemyManager(scene) {
               e.phase = 1;
             } else if (e.phase === 1) {
               e.mesh.position.z -= 12 * dt;
-              e.phaseTimer += dt;
-              if (e.phaseTimer > 1.5) {
+              if ((e.phaseTimer += dt) > 1.5) {
                 e.phaseTimer = 0;
                 onShoot(e.mesh.position.x, e.mesh.position.y, playerX, playerY);
               }
