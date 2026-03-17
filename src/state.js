@@ -11,14 +11,14 @@ export const state = {
   score: 0,
   hiScore: parseInt(localStorage.getItem('hiScore') || '0'),
   lives: 3,
-  level: 1,
-  wave: 0,
-  multiplier: 1,
-  killStreak: 0,
+  level: 1,       // 1-3
+  wave: 0,        // 0-4 within a level
+  multiplier: 1,  // 1, 2, or 4
+  killStreak: 0,  // consecutive kills toward next multiplier step
   lastKillTime: 0,
   invincible: false,
   invincibleUntil: 0,
-  activePowerUps: {},
+  activePowerUps: {}, // { spreadShot: expiry_ms, rapidFire: expiry_ms, shield: true, speedBoost: expiry_ms }
   hasBomb: false,
 };
 
