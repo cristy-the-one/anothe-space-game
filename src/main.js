@@ -10,6 +10,7 @@ import { createPowerUpManager } from './powerups.js';
 import { createWaveSequencer } from './levels.js';
 import { aabbOverlap } from './collision.js';
 import { addKill, resetStreak } from './score.js';
+import { createBoss } from './boss.js';
 
 const FIRE_RATE = 0.15;
 
@@ -28,6 +29,13 @@ const enemies = createEnemyManager(scene);
 const particles = createParticleSystem(scene);
 const powerups = createPowerUpManager(scene);
 const sequencer = createWaveSequencer((type, x, y) => enemies.spawn(type, x, y));
+let boss = null;
+
+function startBoss() {
+  boss = createBoss(scene, state.level - 1);
+  state.phase = PHASE.BOSS_FIGHT;
+  document.getElementById('boss-bar-container').style.display = 'block';
+}
 
 let lastTime = performance.now();
 function loop(now) {
@@ -67,7 +75,47 @@ function loop(now) {
       const result = sequencer.update(dt, enemies.active.length);
       if (result === 'wave_clear') {
         const next = sequencer.nextWave();
-        if (next === 'boss_time') state.phase = PHASE.BOSS_FIGHT;
+        if (next === 'boss_time') startBoss();
+      }
+    }
+
+    if (state.phase === PHASE.BOSS_FIGHT && boss) {
+      boss.update(dt, player.mesh.position.x, player.mesh.position.y,
+        (ex, ey, px, py) => bullets.spawnEnemyBullet(ex, ey, px, py));
+
+      // Update boss health bar
+      document.getElementById('boss-bar-fill').style.width = (boss.hpFraction * 100) + '%';
+
+      // Player bullets vs boss
+      for (let i = bullets.activeBullets.length - 1; i >= 0; i--) {
+        const b = bullets.activeBullets[i];
+        if (b.owner !== 'player') continue;
+        if (aabbOverlap({ x: b.mesh.position.x, y: b.mesh.position.y, hw: 0.15, hh: 0.15 }, boss.getBBox())) {
+          boss.takeDamage(1);
+          bullets.recycleBullet(b);
+          if (!boss.alive) {
+            addKill('boss', Date.now());
+            particles.explode(0, 0, -25, 40, 0xff4400);
+            document.getElementById('boss-bar-container').style.display = 'none';
+            boss = null;
+            // Level clear
+            const next = sequencer.nextLevel();
+            if (next === 'victory') {
+              state.phase = PHASE.GAME_OVER; // victory handled in Task 13
+            } else {
+              state.phase = PHASE.LEVEL_CLEAR;
+            }
+            break;
+          }
+        }
+      }
+
+      // Boss vs player collision
+      if (boss && aabbOverlap(boss.getBBox(), player.getBBox())) {
+        if (player.takeDamage()) {
+          resetStreak();
+          particles.explode(player.mesh.position.x, player.mesh.position.y, 0, 12, 0xffffff);
+        }
       }
     }
 
