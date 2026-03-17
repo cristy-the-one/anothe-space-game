@@ -13,7 +13,7 @@ const { composer, crtPass } = createRenderer(scene, camera);
 setupScene(scene);
 const starfield = createStarfield(scene);
 
-let lastTime = 0;
+let lastTime = performance.now();
 function loop(now) {
   requestAnimationFrame(loop);
   const dt = Math.min((now - lastTime) / 1000, 0.05);

@@ -9,8 +9,6 @@ export function setupScene(scene) {
   const dirLight = new THREE.DirectionalLight(0x00ff41, 1.0);
   dirLight.position.set(5, 10, 5);
   scene.add(dirLight);
-
-  return scene;
 }
 
 export function createStarfield(scene) {
