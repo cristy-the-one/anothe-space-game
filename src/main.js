@@ -11,6 +11,7 @@ import { createWaveSequencer } from './levels.js';
 import { aabbOverlap } from './collision.js';
 import { addKill, resetStreak } from './score.js';
 import { createBoss } from './boss.js';
+import { createUI } from './ui.js';
 
 const FIRE_RATE = 0.15;
 
@@ -30,6 +31,7 @@ const particles = createParticleSystem(scene);
 const powerups = createPowerUpManager(scene);
 const sequencer = createWaveSequencer((type, x, y) => enemies.spawn(type, x, y));
 let boss = null;
+const ui = createUI();
 
 function startBoss() {
   boss = createBoss(scene, state.level - 1);
@@ -102,9 +104,11 @@ function loop(now) {
             // Level clear
             const next = sequencer.nextLevel();
             if (next === 'victory') {
-              state.phase = PHASE.GAME_OVER; // victory handled in Task 13
+              state.phase = PHASE.GAME_OVER;
+              ui.showGameOver(true);
             } else {
               state.phase = PHASE.LEVEL_CLEAR;
+              ui.showLevelClear(state.level);
             }
             break;
           }
@@ -151,6 +155,12 @@ function loop(now) {
         if (player.takeDamage()) {
           resetStreak();
           particles.explode(player.mesh.position.x, player.mesh.position.y, 0, 12, 0xffffff);
+          if (state.lives === 0) {
+            state.phase = PHASE.GAME_OVER;
+            ui.showGameOver(false);
+            enemies.clear(); bullets.clear(); powerups.clear(); boss = null;
+            document.getElementById('boss-bar-container').style.display = 'none';
+          }
         }
       }
     }
@@ -162,6 +172,12 @@ function loop(now) {
         if (player.takeDamage()) {
           resetStreak();
           particles.explode(player.mesh.position.x, player.mesh.position.y, 0, 12, 0xffffff);
+          if (state.lives === 0) {
+            state.phase = PHASE.GAME_OVER;
+            ui.showGameOver(false);
+            enemies.clear(); bullets.clear(); powerups.clear(); boss = null;
+            document.getElementById('boss-bar-container').style.display = 'none';
+          }
         }
       }
     }
@@ -175,18 +191,28 @@ function loop(now) {
     }
   }
 
+  ui.update();
   composer.render();
 }
 requestAnimationFrame(loop);
 
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && state.phase === PHASE.MENU) {
-    document.getElementById('screen-overlay').classList.add('hidden');
-    resetForNewGame();
+  if (e.key === 'Enter') {
+    if (state.phase === PHASE.MENU) {
+      ui.hideLevelScreen();
+      resetForNewGame();
+      enemies.clear(); bullets.clear(); powerups.clear(); particles.clear();
+      sequencer.reset();
+      player.reset();
+    } else if (state.phase === PHASE.LEVEL_CLEAR) {
+      state.level++;
+      state.phase = PHASE.PLAYING;
+      ui.hideLevelScreen();
+    } else if (state.phase === PHASE.GAME_OVER) {
+      state.phase = PHASE.MENU;
+      ui.showMenu();
+    }
   }
-});
-
-document.addEventListener('keydown', e => {
   if (e.code === 'KeyB' && state.hasBomb) {
     state.hasBomb = false;
     enemies.clear();
