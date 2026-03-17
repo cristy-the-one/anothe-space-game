@@ -49,7 +49,6 @@ const LEVELS = [
 export function createWaveSequencer(onSpawn) {
   let levelIdx = 0;
   let waveIdx = 0;
-  let waveTimer = 0;
   let pendingSpawns = []; // { type, x, y, at_time }
   let waveStartTime = 0;
   let waitingForClear = false;
@@ -77,7 +76,7 @@ export function createWaveSequencer(onSpawn) {
 
   return {
     get levelNumber() { return levelIdx + 1; },
-    get waveNumber()  { return waveIdx + 1; },
+    get waveNumber()  { return Math.min(waveIdx, LEVELS[levelIdx].waves.length - 1) + 1; },
     get totalWaves()  { return LEVELS[levelIdx].waves.length; },
     get isBossTime()  { return waveIdx >= LEVELS[levelIdx].waves.length; },
     get isLastLevel() { return levelIdx >= LEVELS.length - 1; },
