@@ -45,15 +45,11 @@ export function createEnemyManager(scene) {
             e.mesh.position.x = e.spawnX + Math.sin(e.age * 2.5) * 3;
             break;
           case 'shooter':
-            if (e.phase === 0) {
-              // Advance until stopped
-              if (e.mesh.position.z >= -15) {
-                e.mesh.position.z = -15;
-                e.phase = 1; // now stopped
-              }
+            if (e.phase === 0 && e.mesh.position.z >= -15) {
+              e.mesh.position.z = -15;
+              e.phase = 1;
             } else if (e.phase === 1) {
-              // Stopped: shoot periodically, then retreat after 4s total age
-              e.mesh.position.z -= 12 * dt; // cancel base advance — stay stopped
+              e.mesh.position.z -= 12 * dt;
               e.phaseTimer += dt;
               if (e.phaseTimer > 1.5) {
                 e.phaseTimer = 0;
@@ -61,8 +57,7 @@ export function createEnemyManager(scene) {
               }
               if (e.age > 4) e.phase = 2;
             } else if (e.phase === 2) {
-              // Retreat
-              e.mesh.position.z -= (12 + 8) * dt; // cancel base + retreat
+              e.mesh.position.z -= 20 * dt;
             }
             break;
           case 'kamikaze':
