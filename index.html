@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPACE RAILS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #000; overflow: hidden; width: 100vw; height: 100vh; }
+    #canvas-container { position: relative; width: 100%; height: 100%; }
+    canvas { display: block; width: 100% !important; height: 100% !important; }
+    #hud {
+      position: absolute; inset: 0; pointer-events: none;
+      font-family: 'Press Start 2P', monospace; color: #00ff41;
+      font-size: 12px; padding: 16px;
+    }
+    #hud-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    #hud-center { text-align: center; }
+    #boss-bar-container {
+      position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+      width: 400px; display: none;
+    }
+    #boss-bar-label { text-align: center; margin-bottom: 4px; font-size: 10px; color: #ff4444; }
+    #boss-bar-bg { background: #300; height: 12px; border: 1px solid #f44; }
+    #boss-bar-fill { background: #f44; height: 100%; width: 100%; transition: width 0.1s; }
+    #screen-overlay {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; background: rgba(0,0,0,0.85);
+      font-family: 'Press Start 2P', monospace; color: #00ff41; text-align: center;
+      gap: 24px;
+    }
+    #screen-overlay h1 { font-size: 32px; text-shadow: 0 0 20px #00ff41; }
+    #screen-overlay p { font-size: 12px; color: #aaffaa; line-height: 2; }
+    #screen-overlay.hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div id="canvas-container">
+    <div id="hud">
+      <div id="hud-top">
+        <div id="hud-score">
+          <div>SCORE</div>
+          <div id="score-value">0</div>
+          <div style="margin-top:8px;font-size:10px;color:#aaffaa">HI</div>
+          <div id="hiscore-value">0</div>
+        </div>
+        <div id="hud-center">
+          <div id="level-value">LEVEL 1</div>
+          <div id="multiplier-value" style="font-size:10px;color:#ffff00;margin-top:4px"></div>
+        </div>
+        <div id="hud-lives">
+          <div>LIVES</div>
+          <div id="lives-value">♦ ♦ ♦</div>
+        </div>
+      </div>
+      <div id="boss-bar-container">
+        <div id="boss-bar-label">BOSS</div>
+        <div id="boss-bar-bg"><div id="boss-bar-fill"></div></div>
+      </div>
+    </div>
+    <div id="screen-overlay">
+      <h1>SPACE RAILS</h1>
+      <p>WASD / ARROWS — MOVE<br>SPACE / CLICK — SHOOT<br>B / RIGHT CLICK — BOMB</p>
+      <p id="hiscore-display">HI-SCORE: 0</p>
+      <p style="animation: blink 1s step-end infinite">PRESS ENTER TO START</p>
+    </div>
+  </div>
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+  </script>
+  <script type="module" src="src/main.js"></script>
+  <style>
+    @keyframes blink { 50% { opacity: 0; } }
+  </style>
+</body>
+</html>
