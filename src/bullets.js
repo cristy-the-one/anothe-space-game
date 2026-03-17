@@ -10,7 +10,7 @@ function makeBulletMesh(color) {
 }
 
 export function createBulletPool(scene) {
-  // Two pools: player (green) and enemy (red)
+  // Two pools: player bullets (cyan 0x00ffff) and enemy bullets (red 0xff4444)
   const playerPool = Array.from({ length: POOL_SIZE }, () => {
     const m = makeBulletMesh(0x00ffff); m.visible = false; scene.add(m); return m;
   });
@@ -65,6 +65,7 @@ export function createBulletPool(scene) {
     },
 
     clear() {
+      // Positions are reset at spawn time — only hide and drain the active list
       for (let i = activeBullets.length - 1; i >= 0; i--) {
         activeBullets[i].mesh.visible = false;
       }
