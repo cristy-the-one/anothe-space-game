@@ -6,6 +6,7 @@ import { createPlayer } from './player.js';
 import { createBulletPool } from './bullets.js';
 import { createEnemyManager } from './enemies.js';
 import { createParticleSystem } from './particles.js';
+import { createPowerUpManager } from './powerups.js';
 import { aabbOverlap } from './collision.js';
 import { addKill, resetStreak } from './score.js';
 
@@ -24,6 +25,7 @@ const player = createPlayer(scene);
 const bullets = createBulletPool(scene);
 const enemies = createEnemyManager(scene);
 const particles = createParticleSystem(scene);
+const powerups = createPowerUpManager(scene);
 
 // Temporary: spawn a few enemies to test
 setTimeout(() => {
@@ -66,6 +68,7 @@ function loop(now) {
       (ex, ey, px, py) => bullets.spawnEnemyBullet(ex, ey, px, py));
 
     particles.update(dt);
+    powerups.update(dt);
 
     // Player bullets vs enemies
     for (let i = bullets.activeBullets.length - 1; i >= 0; i--) {
@@ -80,6 +83,7 @@ function loop(now) {
           if (e.hp <= 0) {
             addKill(e.type, Date.now());
             particles.explode(e.mesh.position.x, e.mesh.position.y, e.mesh.position.z, 8, 0xff6600);
+            powerups.trySpawn(e.mesh.position.x, e.mesh.position.y, e.mesh.position.z);
             enemies.remove(e);
           }
           break;
@@ -111,6 +115,14 @@ function loop(now) {
         }
       }
     }
+
+    // Player collects power-up
+    for (let i = powerups.active.length - 1; i >= 0; i--) {
+      if (aabbOverlap(powerups.getBBox(powerups.active[i]), playerBB)) {
+        powerups.collect(powerups.active[i]);
+        // TODO: play power-up sound (Task 14)
+      }
+    }
   }
 
   composer.render();
@@ -122,4 +134,16 @@ document.addEventListener('keydown', (e) => {
     document.getElementById('screen-overlay').classList.add('hidden');
     resetForNewGame();
   }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'KeyB' && state.hasBomb) {
+    state.hasBomb = false;
+    enemies.clear();
+  }
+});
+
+document.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  if (state.hasBomb) { state.hasBomb = false; enemies.clear(); }
 });
