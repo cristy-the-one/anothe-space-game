@@ -5,6 +5,8 @@ import { setupScene, createStarfield } from './scene.js';
 import { createPlayer } from './player.js';
 import { createBulletPool } from './bullets.js';
 import { createEnemyManager } from './enemies.js';
+import { aabbOverlap } from './collision.js';
+import { addKill, resetStreak } from './score.js';
 
 const FIRE_RATE = 0.15;
 
@@ -60,6 +62,45 @@ function loop(now) {
 
     enemies.update(dt, player.mesh.position.x, player.mesh.position.y,
       (ex, ey, px, py) => bullets.spawnEnemyBullet(ex, ey, px, py));
+
+    // Player bullets vs enemies
+    for (let i = bullets.activeBullets.length - 1; i >= 0; i--) {
+      const b = bullets.activeBullets[i];
+      if (b.owner !== 'player') continue;
+      const bb = { x: b.mesh.position.x, y: b.mesh.position.y, hw: 0.15, hh: 0.15 };
+      for (let j = enemies.active.length - 1; j >= 0; j--) {
+        const e = enemies.active[j];
+        if (aabbOverlap(bb, enemies.getBBox(e))) {
+          e.hp--;
+          bullets.recycleBullet(b);
+          if (e.hp <= 0) {
+            addKill(e.type, Date.now());
+            // TODO: spawn explosion (Task 9), spawn power-up (Task 10)
+            enemies.remove(e);
+          }
+          break;
+        }
+      }
+    }
+
+    // Enemy bullets vs player
+    const playerBB = player.getBBox();
+    for (let i = bullets.activeBullets.length - 1; i >= 0; i--) {
+      const b = bullets.activeBullets[i];
+      if (b.owner !== 'enemy') continue;
+      if (aabbOverlap({ x: b.mesh.position.x, y: b.mesh.position.y, hw: 0.1, hh: 0.1 }, playerBB)) {
+        bullets.recycleBullet(b);
+        if (player.takeDamage()) resetStreak();
+      }
+    }
+
+    // Enemies vs player (body collision)
+    for (const e of enemies.active) {
+      if (aabbOverlap(enemies.getBBox(e), playerBB)) {
+        enemies.remove(e);
+        if (player.takeDamage()) resetStreak();
+      }
+    }
   }
 
   composer.render();
