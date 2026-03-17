@@ -24,7 +24,7 @@ function loop(now) {
 
   starfield.update(dt, 20);
 
-  if (state.phase === 'PLAYING' || state.phase === 'BOSS_FIGHT') {
+  if (state.phase === PHASE.PLAYING || state.phase === PHASE.BOSS_FIGHT) {
     player.update(dt);
   }
 

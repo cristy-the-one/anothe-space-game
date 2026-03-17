@@ -36,7 +36,12 @@ export function createPlayer(scene) {
 
   // Input state
   const keys = {};
-  document.addEventListener('keydown', e => keys[e.code] = true);
+  document.addEventListener('keydown', e => {
+    keys[e.code] = true;
+    if (['KeyA','KeyD','KeyW','KeyS','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.code)) {
+      useMouseMove = false;
+    }
+  });
   document.addEventListener('keyup',   e => keys[e.code] = false);
 
   // Mouse position (normalized to game bounds)
@@ -50,7 +55,6 @@ export function createPlayer(scene) {
   });
 
   // Shooting
-  let shootCooldown = 0;
   const shooting = { active: false };
   document.addEventListener('keydown', e => { if (e.code === 'Space') shooting.active = true; });
   document.addEventListener('keyup',   e => { if (e.code === 'Space') shooting.active = false; });
@@ -114,6 +118,8 @@ export function createPlayer(scene) {
     reset() {
       mesh.position.set(0, 0, 0);
       this.shootCooldown = 0;
+      mesh.visible = true;
+      mesh.rotation.z = 0;
     },
   };
 }
