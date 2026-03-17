@@ -5,6 +5,7 @@ import { setupScene, createStarfield } from './scene.js';
 import { createPlayer } from './player.js';
 import { createBulletPool } from './bullets.js';
 import { createEnemyManager } from './enemies.js';
+import { createParticleSystem } from './particles.js';
 import { aabbOverlap } from './collision.js';
 import { addKill, resetStreak } from './score.js';
 
@@ -22,6 +23,7 @@ const starfield = createStarfield(scene);
 const player = createPlayer(scene);
 const bullets = createBulletPool(scene);
 const enemies = createEnemyManager(scene);
+const particles = createParticleSystem(scene);
 
 // Temporary: spawn a few enemies to test
 setTimeout(() => {
@@ -63,6 +65,8 @@ function loop(now) {
     enemies.update(dt, player.mesh.position.x, player.mesh.position.y,
       (ex, ey, px, py) => bullets.spawnEnemyBullet(ex, ey, px, py));
 
+    particles.update(dt);
+
     // Player bullets vs enemies
     for (let i = bullets.activeBullets.length - 1; i >= 0; i--) {
       const b = bullets.activeBullets[i];
@@ -75,7 +79,7 @@ function loop(now) {
           bullets.recycleBullet(b);
           if (e.hp <= 0) {
             addKill(e.type, Date.now());
-            // TODO: spawn explosion (Task 9), spawn power-up (Task 10)
+            particles.explode(e.mesh.position.x, e.mesh.position.y, e.mesh.position.z, 8, 0xff6600);
             enemies.remove(e);
           }
           break;
@@ -90,7 +94,10 @@ function loop(now) {
       if (b.owner !== 'enemy') continue;
       if (aabbOverlap({ x: b.mesh.position.x, y: b.mesh.position.y, hw: 0.1, hh: 0.1 }, playerBB)) {
         bullets.recycleBullet(b);
-        if (player.takeDamage()) resetStreak();
+        if (player.takeDamage()) {
+          resetStreak();
+          particles.explode(player.mesh.position.x, player.mesh.position.y, 0, 12, 0xffffff);
+        }
       }
     }
 
@@ -98,7 +105,10 @@ function loop(now) {
     for (const e of enemies.active) {
       if (aabbOverlap(enemies.getBBox(e), playerBB)) {
         enemies.remove(e);
-        if (player.takeDamage()) resetStreak();
+        if (player.takeDamage()) {
+          resetStreak();
+          particles.explode(player.mesh.position.x, player.mesh.position.y, 0, 12, 0xffffff);
+        }
       }
     }
   }
