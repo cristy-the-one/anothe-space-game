@@ -2,18 +2,10 @@ import * as THREE from 'three';
 import { state } from './state.js';
 
 const MESHES = {
-<<<<<<< HEAD
-  grunt:    () => new THREE.Mesh(new THREE.BoxGeometry(0.8,0.8,0.8), new THREE.MeshBasicMaterial({color:0xffaa44, wireframe:true})),
-  weaver:   () => new THREE.Mesh(new THREE.OctahedronGeometry(0.6),  new THREE.MeshBasicMaterial({color:0xffff44, wireframe:true})),
-  shooter:  () => new THREE.Mesh(new THREE.DodecahedronGeometry(0.6),new THREE.MeshBasicMaterial({color:0xff44cc, wireframe:true})),
-  kamikaze: () => new THREE.Mesh(new THREE.TetrahedronGeometry(0.7), new THREE.MeshBasicMaterial({color:0xff4444, wireframe:true})),
-=======
-  grunt:    () => new THREE.Mesh(new THREE.BoxGeometry(0.8,0.8,0.8), new THREE.MeshStandardMaterial({color:0xff4422,emissive:0xff4422,emissiveIntensity:1})),
-  weaver:   () => new THREE.Mesh(new THREE.OctahedronGeometry(0.6),  new THREE.MeshStandardMaterial({color:0xff8800,emissive:0xff8800,emissiveIntensity:1})),
-  shooter:  () => new THREE.Mesh(new THREE.DodecahedronGeometry(0.6),new THREE.MeshStandardMaterial({color:0xff2288,emissive:0xff2288,emissiveIntensity:1})),
-  kamikaze: () => new THREE.Mesh(new THREE.TetrahedronGeometry(0.7), new THREE.MeshStandardMaterial({color:0xff0000,emissive:0xff0000,emissiveIntensity:1})),
->>>>>>> acec48d (feat: enemies use solid emissive materials on layer 1)
-};
+  grunt:    () => new THREE.Mesh(new THREE.BoxGeometry(0.8,0.8,0.8), new THREE.MeshBasicMaterial({color:0xff8800,emissive:0x442200,emissiveIntensity:1})),
+  weaver:   () => new THREE.Mesh(new THREE.OctahedronGeometry(0.6),  new THREE.MeshBasicMaterial({color:0xffff44,emissive:0x664400,emissiveIntensity:1})),
+  shooter:  () => new THREE.Mesh(new THREE.DodecahedronGeometry(0.6),new THREE.MeshBasicMaterial({color:0xff44cc,emissive:0x442266,emissiveIntensity:1})),
+  kamikaze: () => new THREE.Mesh(new THREE.TetrahedronGeometry(0.7), new THREE.MeshBasicMaterial({color:0xff4444,emissive:0x442200,emissiveIntensity:1})),};
 
 export function createEnemyManager(scene) {
   const active = []; // { mesh, type, hp, phase, phaseTimer, spawnX, age }
