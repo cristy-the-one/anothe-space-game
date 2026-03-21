@@ -71,9 +71,10 @@ export function createRenderer(scene, camera) {
   crtPass.uniforms.resolution.value.set(container.clientWidth, container.clientHeight);
   composerLayer0.addPass(crtPass);
 
-  // composerLayer1: pixel only, no CRT, clear=false for overlay
+  // composerLayer1: pixel only, no CRT, renders on top without clearing
   const composerLayer1 = new EffectComposer(renderer);
-  const renderPass1 = new RenderPass(scene, camera, undefined, false);
+  const renderPass1 = new RenderPass(scene, camera);
+  renderPass1.clear = false;
   composerLayer1.addPass(renderPass1);
 
   const pixelPass1 = new ShaderPass(PixelShader);
@@ -85,12 +86,14 @@ export function createRenderer(scene, camera) {
   window.addEventListener('resize', () => {
     const w = container.clientWidth, h = container.clientHeight;
     renderer.setSize(w, h);
-    composer.setSize(w, h);
+    composerLayer0.setSize(w, h);
+    composerLayer1.setSize(w, h);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
-    pixelPass.uniforms.resolution.value.set(w, h);
+    pixelPass0.uniforms.resolution.value.set(w, h);
+    pixelPass1.uniforms.resolution.value.set(w, h);
     crtPass.uniforms.resolution.value.set(w, h);
   });
 
-  return { renderer, composer, crtPass };
+  return { renderer, composerLayer0, composerLayer1, crtPass };
 }

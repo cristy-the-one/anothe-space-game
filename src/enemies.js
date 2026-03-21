@@ -2,10 +2,11 @@ import * as THREE from 'three';
 import { state } from './state.js';
 
 const MESHES = {
-  grunt:    () => new THREE.Mesh(new THREE.BoxGeometry(0.8,0.8,0.8), new THREE.MeshBasicMaterial({color:0xff8800,emissive:0x442200,emissiveIntensity:1})),
-  weaver:   () => new THREE.Mesh(new THREE.OctahedronGeometry(0.6),  new THREE.MeshBasicMaterial({color:0xffff44,emissive:0x664400,emissiveIntensity:1})),
-  shooter:  () => new THREE.Mesh(new THREE.DodecahedronGeometry(0.6),new THREE.MeshBasicMaterial({color:0xff44cc,emissive:0x442266,emissiveIntensity:1})),
-  kamikaze: () => new THREE.Mesh(new THREE.TetrahedronGeometry(0.7), new THREE.MeshBasicMaterial({color:0xff4444,emissive:0x442200,emissiveIntensity:1})),};
+  grunt:    () => new THREE.Mesh(new THREE.BoxGeometry(0.8,0.8,0.8), new THREE.MeshBasicMaterial({color:0xff8800})),
+  weaver:   () => new THREE.Mesh(new THREE.OctahedronGeometry(0.6),  new THREE.MeshBasicMaterial({color:0xffff44})),
+  shooter:  () => new THREE.Mesh(new THREE.DodecahedronGeometry(0.6),new THREE.MeshBasicMaterial({color:0xff44cc})),
+  kamikaze: () => new THREE.Mesh(new THREE.TetrahedronGeometry(0.7), new THREE.MeshBasicMaterial({color:0xff4444})),
+};
 
 export function createEnemyManager(scene) {
   const active = []; // { mesh, type, hp, phase, phaseTimer, spawnX, age }
