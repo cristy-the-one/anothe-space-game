@@ -12,10 +12,10 @@ function makeBulletMesh(color) {
 export function createBulletPool(scene) {
   // Two pools: player bullets (cyan 0x00ffff) and enemy bullets (red 0xff4444)
   const playerPool = Array.from({ length: POOL_SIZE }, () => {
-    const m = makeBulletMesh(0x00ffff); m.visible = false; scene.add(m); return m;
+    const m = makeBulletMesh(0x00ffff); m.layers.set(1); m.visible = false; scene.add(m); return m;
   });
   const enemyPool = Array.from({ length: POOL_SIZE }, () => {
-    const m = makeBulletMesh(0xff4444); m.visible = false; scene.add(m); return m;
+    const m = makeBulletMesh(0xff4444); m.layers.set(1); m.visible = false; scene.add(m); return m;
   });
 
   const activeBullets = []; // { mesh, vx, vy, vz, owner: 'player'|'enemy' }
