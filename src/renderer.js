@@ -43,9 +43,10 @@ const CRTShader = {
       // Scanlines
       float line = mod(floor(vUv.y * resolution.y), 2.0);
       col.rgb *= 0.85 + 0.15 * line;
-      // Green phosphor tint
-      col.rgb = vec3(col.r * 0.2 + col.g * 0.1, col.g * 0.9 + col.r * 0.3, col.b * 0.2);
-      col.rgb += vec3(0.0, 0.05, 0.0); // ambient green glow
+      // Subtle green phosphor tint — preserves color identity, adds atmosphere
+      float brightness = dot(col.rgb, vec3(0.299, 0.587, 0.114));
+      col.rgb = mix(col.rgb, vec3(0.0, brightness * 1.2, 0.0), 0.25);
+      col.rgb += vec3(0.0, 0.03, 0.0); // ambient green glow
       gl_FragColor = col;
     }`,
 };
