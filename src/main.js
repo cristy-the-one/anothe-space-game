@@ -21,7 +21,7 @@ const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerH
 camera.position.set(0, 2, 8);
 camera.lookAt(0, 0, 0);
 
-const { composer, crtPass } = createRenderer(scene, camera);
+const { composerLayer0, composerLayer1, crtPass } = createRenderer(scene, camera);
 
 setupScene(scene);
 const starfield = createStarfield(scene);
@@ -214,7 +214,17 @@ function loop(now) {
   }
 
   ui.update();
-  composer.render();
+
+  // Render Layer 0: full scene with CRT green tint
+  composerLayer0.render();
+
+  // Render Layer 1: overlay (brighter, no CRT) — only layer 1 objects
+  camera.layers.disableAll();
+  camera.layers.enable(1);
+  composerLayer1.render();
+
+  // Restore default layers (0)
+  camera.layers.enable(0);
 }
 requestAnimationFrame(loop);
 

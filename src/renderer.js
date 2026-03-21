@@ -55,19 +55,31 @@ export function createRenderer(scene, camera) {
   const renderer = new THREE.WebGLRenderer({ antialias: false });
   renderer.setPixelRatio(1); // crisp pixels
   renderer.setSize(container.clientWidth, container.clientHeight);
+  renderer.autoClear = false;
   container.insertBefore(renderer.domElement, container.firstChild);
 
-  const composer = new EffectComposer(renderer);
-  composer.addPass(new RenderPass(scene, camera));
+  const composerLayer0 = new EffectComposer(renderer);
+  const renderPass0 = new RenderPass(scene, camera);
+  composerLayer0.addPass(renderPass0);
 
-  const pixelPass = new ShaderPass(PixelShader);
-  pixelPass.uniforms.resolution.value.set(container.clientWidth, container.clientHeight);
-  pixelPass.uniforms.pixelSize.value = 3.0;
-  composer.addPass(pixelPass);
+  const pixelPass0 = new ShaderPass(PixelShader);
+  pixelPass0.uniforms.resolution.value.set(container.clientWidth, container.clientHeight);
+  pixelPass0.uniforms.pixelSize.value = 3.0;
+  composerLayer0.addPass(pixelPass0);
 
   const crtPass = new ShaderPass(CRTShader);
   crtPass.uniforms.resolution.value.set(container.clientWidth, container.clientHeight);
-  composer.addPass(crtPass);
+  composerLayer0.addPass(crtPass);
+
+  // composerLayer1: pixel only, no CRT, clear=false for overlay
+  const composerLayer1 = new EffectComposer(renderer);
+  const renderPass1 = new RenderPass(scene, camera, undefined, false);
+  composerLayer1.addPass(renderPass1);
+
+  const pixelPass1 = new ShaderPass(PixelShader);
+  pixelPass1.uniforms.resolution.value.set(container.clientWidth, container.clientHeight);
+  pixelPass1.uniforms.pixelSize.value = 3.0;
+  composerLayer1.addPass(pixelPass1);
 
   // Handle resize
   window.addEventListener('resize', () => {
