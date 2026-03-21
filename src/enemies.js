@@ -12,7 +12,7 @@ export function createEnemyManager(scene) {
   const active = []; // { mesh, type, hp, phase, phaseTimer, spawnX, age }
 
   function spawn(type, x, y) {
-    const mesh = MESHES[type](); mesh.layers.set(1);
+    const mesh = MESHES[type]();
     mesh.position.set(x, y, -60);
     scene.add(mesh);
     active.push({ mesh, type, hp: type === 'kamikaze' ? 1 : 2, phase: 0, phaseTimer: 0, spawnX: x, age: 0 });

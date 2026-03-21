@@ -16,7 +16,6 @@ function buildBossMesh(levelIdx) {
   const arm2 = arm1.clone();
   arm2.rotation.z = Math.PI / 2;
   g.add(arm2);
-  g.traverse(child => { if (child.isMesh) child.layers.set(1); });
   return { group: g, ring };
 }
 
