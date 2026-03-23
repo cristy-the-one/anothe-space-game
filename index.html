@@ -2,13 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>SPACE RAILS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #000; overflow: hidden; width: 100vw; height: 100vh; }
+    body { background: #000; overflow: hidden; width: 100vw; height: 100vh;
+           touch-action: none; user-select: none; -webkit-user-select: none; }
     #canvas-container { position: relative; width: 100%; height: 100%; }
     canvas { display: block; width: 100% !important; height: 100% !important; }
     #hud {
@@ -34,6 +37,16 @@
     #screen-overlay h1 { font-size: 32px; text-shadow: 0 0 20px #00ff41; }
     #screen-overlay p { font-size: 12px; color: #aaffaa; line-height: 2; }
     #screen-overlay.hidden { display: none; }
+    #bomb-btn {
+      position: absolute; bottom: 24px; right: 24px;
+      width: 72px; height: 72px; border-radius: 50%;
+      background: rgba(255,80,0,0.25); border: 2px solid #ff5000;
+      color: #ff5000; font-family: 'Press Start 2P', monospace; font-size: 9px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px; cursor: pointer; pointer-events: all; line-height: 1.4;
+    }
+    #bomb-btn.no-bomb { opacity: 0.25; }
+    #bomb-btn span { font-size: 20px; }
   </style>
 </head>
 <body>
@@ -59,12 +72,15 @@
         <div id="boss-bar-label">BOSS</div>
         <div id="boss-bar-bg"><div id="boss-bar-fill"></div></div>
       </div>
+      <div id="bomb-btn" class="no-bomb">
+        <span>💣</span>BOMB
+      </div>
     </div>
     <div id="screen-overlay">
       <h1>SPACE RAILS</h1>
-      <p>WASD / ARROWS — MOVE<br>SPACE / CLICK — SHOOT<br>B / RIGHT CLICK — BOMB</p>
+      <p>MOVE — WASD / ARROWS / TOUCH<br>SHOOT — SPACE / CLICK / TOUCH<br>BOMB — B / RIGHT CLICK / 💣 BUTTON</p>
       <p id="hiscore-display">HI-SCORE: 0</p>
-      <p style="animation: blink 1s step-end infinite">PRESS ENTER TO START</p>
+      <p style="animation: blink 1s step-end infinite">PRESS ENTER OR TAP TO START</p>
     </div>
   </div>
   <script type="importmap">

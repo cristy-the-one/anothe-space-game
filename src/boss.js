@@ -47,6 +47,10 @@ export function createBoss(scene, levelIdx) {
       if (hp <= 0) { alive = false; scene.remove(group); }
     },
 
+    destroy() {
+      if (alive) { alive = false; scene.remove(group); }
+    },
+
     getBBox() {
       return { x: group.position.x, y: group.position.y, hw: 1.5, hh: 1.5 };
     },

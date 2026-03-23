@@ -44,18 +44,46 @@ export function createPlayer(scene) {
   });
   document.addEventListener('keyup',   e => keys[e.code] = false);
 
-  // Mouse position (normalized to game bounds)
+  // Mouse / touch position (normalized to game bounds)
   let mouseTarget = { x: 0, y: 0 };
   let useMouseMove = false;
+
+  function clientToGame(clientX, clientY) {
+    const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+    return {
+      x: ((clientX - cx) / cx) * BOUNDS.x,
+      y: -((clientY - cy) / cy) * BOUNDS.y,
+    };
+  }
+
   document.addEventListener('mousemove', e => {
     useMouseMove = true;
-    const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
-    mouseTarget.x = ((e.clientX - cx) / cx) * BOUNDS.x;
-    mouseTarget.y = -((e.clientY - cy) / cy) * BOUNDS.y;
+    Object.assign(mouseTarget, clientToGame(e.clientX, e.clientY));
   });
 
-  // Shooting
-  const shooting = { active: false };
+  // Touch: primary finger moves + auto-fires; second finger triggers bomb flag
+  const shooting = { active: false, bombRequested: false };
+
+  document.addEventListener('touchstart', e => {
+    e.preventDefault();
+    useMouseMove = true;
+    shooting.active = true;
+    const t = e.touches[0];
+    Object.assign(mouseTarget, clientToGame(t.clientX, t.clientY));
+    if (e.touches.length >= 2) shooting.bombRequested = true;
+  }, { passive: false });
+
+  document.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const t = e.touches[0];
+    Object.assign(mouseTarget, clientToGame(t.clientX, t.clientY));
+  }, { passive: false });
+
+  document.addEventListener('touchend', e => {
+    e.preventDefault();
+    if (e.touches.length === 0) shooting.active = false;
+  }, { passive: false });
+
   document.addEventListener('keydown', e => { if (e.code === 'Space') shooting.active = true; });
   document.addEventListener('keyup',   e => { if (e.code === 'Space') shooting.active = false; });
   document.addEventListener('mousedown', e => { if (e.button === 0) shooting.active = true; });

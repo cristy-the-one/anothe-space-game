@@ -10,7 +10,7 @@ export const state = {
   phase: PHASE.MENU,
   score: 0,
   hiScore: parseInt(localStorage.getItem('hiScore') || '0'),
-  lives: 3,
+  lives: 20,
   level: 1,       // 1-3
   wave: 0,        // 0-4 within a level
   multiplier: 1,  // 1, 2, or 4
@@ -25,7 +25,7 @@ export const state = {
 export function resetForNewGame() {
   state.phase = PHASE.PLAYING;
   state.score = 0;
-  state.lives = 3;
+  state.lives = 20;
   state.level = 1;
   state.wave = 0;
   state.multiplier = 1;

@@ -133,7 +133,7 @@ function loop(now) {
           if (state.lives === 0) {
             state.phase = PHASE.GAME_OVER;
             ui.showGameOver(false);
-            enemies.clear(); bullets.clear(); powerups.clear(); particles.clear(); boss = null;
+            enemies.clear(); bullets.clear(); powerups.clear(); particles.clear(); if (boss) { boss.destroy(); boss = null; }
             sequencer.reset(); player.reset();
             document.getElementById('boss-bar-container').style.display = 'none';
           }
@@ -177,7 +177,7 @@ function loop(now) {
           if (state.lives === 0) {
             state.phase = PHASE.GAME_OVER;
             ui.showGameOver(false);
-            enemies.clear(); bullets.clear(); powerups.clear(); particles.clear(); boss = null;
+            enemies.clear(); bullets.clear(); powerups.clear(); particles.clear(); if (boss) { boss.destroy(); boss = null; }
             sequencer.reset(); player.reset();
             document.getElementById('boss-bar-container').style.display = 'none';
           }
@@ -196,7 +196,7 @@ function loop(now) {
           if (state.lives === 0) {
             state.phase = PHASE.GAME_OVER;
             ui.showGameOver(false);
-            enemies.clear(); bullets.clear(); powerups.clear(); particles.clear(); boss = null;
+            enemies.clear(); bullets.clear(); powerups.clear(); particles.clear(); if (boss) { boss.destroy(); boss = null; }
             sequencer.reset(); player.reset();
             document.getElementById('boss-bar-container').style.display = 'none';
           }
@@ -218,30 +218,64 @@ function loop(now) {
 }
 requestAnimationFrame(loop);
 
+function advanceScreen() {
+  if (state.phase === PHASE.MENU) {
+    ui.hideLevelScreen();
+    resetForNewGame();
+    enemies.clear(); bullets.clear(); powerups.clear(); particles.clear();
+    if (boss) { boss.destroy(); boss = null; }
+    document.getElementById('boss-bar-container').style.display = 'none';
+    sequencer.reset();
+    player.reset();
+  } else if (state.phase === PHASE.LEVEL_CLEAR) {
+    state.level++;
+    state.phase = PHASE.PLAYING;
+    ui.hideLevelScreen();
+  } else if (state.phase === PHASE.GAME_OVER) {
+    state.phase = PHASE.MENU;
+    ui.showMenu();
+  }
+}
+
+function useBomb() {
+  if (state.hasBomb) { state.hasBomb = false; enemies.clear(); }
+}
+
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    if (state.phase === PHASE.MENU) {
-      ui.hideLevelScreen();
-      resetForNewGame();
-      enemies.clear(); bullets.clear(); powerups.clear(); particles.clear();
-      sequencer.reset();
-      player.reset();
-    } else if (state.phase === PHASE.LEVEL_CLEAR) {
-      state.level++;
-      state.phase = PHASE.PLAYING;
-      ui.hideLevelScreen();
-    } else if (state.phase === PHASE.GAME_OVER) {
-      state.phase = PHASE.MENU;
-      ui.showMenu();
-    }
-  }
-  if (e.code === 'KeyB' && state.hasBomb) {
-    state.hasBomb = false;
-    enemies.clear();
-  }
+  if (e.key === 'Enter') advanceScreen();
+  if (e.code === 'KeyB') useBomb();
 });
 
-document.addEventListener('contextmenu', e => {
+document.addEventListener('contextmenu', e => { e.preventDefault(); useBomb(); });
+
+// Tap on overlay screens = advance (Enter equivalent)
+document.getElementById('screen-overlay').addEventListener('touchstart', e => {
   e.preventDefault();
-  if (state.hasBomb) { state.hasBomb = false; enemies.clear(); }
-});
+  e.stopPropagation();
+  advanceScreen();
+}, { passive: false });
+
+// Bomb button
+const bombBtn = document.getElementById('bomb-btn');
+bombBtn.addEventListener('touchstart', e => {
+  e.preventDefault();
+  e.stopPropagation();
+  useBomb();
+}, { passive: false });
+bombBtn.addEventListener('click', () => useBomb());
+
+// Two-finger touch bomb (checked each frame via player.shooting.bombRequested)
+function loop_checkBombRequest() {
+  if (player.shooting.bombRequested) {
+    player.shooting.bombRequested = false;
+    useBomb();
+  }
+}
+
+// Patch the bomb-btn appearance into ui.update via a RAF hook
+const _origUpdate = ui.update.bind(ui);
+ui.update = function() {
+  _origUpdate();
+  loop_checkBombRequest();
+  bombBtn.classList.toggle('no-bomb', !state.hasBomb);
+};

@@ -45,7 +45,7 @@ const CRTShader = {
       col.rgb *= 0.85 + 0.15 * line;
       // Subtle green phosphor tint — preserves color identity, adds atmosphere
       float brightness = dot(col.rgb, vec3(0.299, 0.587, 0.114));
-      col.rgb = mix(col.rgb, vec3(0.0, brightness * 1.2, 0.0), 0.25);
+      col.rgb = mix(col.rgb, vec3(0.0, brightness * 1.2, 0.0), 0.10);
       col.rgb += vec3(0.0, 0.03, 0.0); // ambient green glow
       gl_FragColor = col;
     }`,
