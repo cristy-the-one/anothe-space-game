@@ -21,7 +21,9 @@ const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerH
 camera.position.set(0, 2, 8);
 camera.lookAt(0, 0, 0);
 
-const { composer, crtPass } = createRenderer(scene, camera);
+const { composer, crtPass, css2dRenderer } = createRenderer(scene, camera);
+const BASE_CAMERA_X = 0;
+const BASE_CAMERA_Y = 2;
 
 setupScene(scene);
 const starfield = createStarfield(scene);
@@ -127,6 +129,7 @@ function loop(now) {
       // Boss vs player collision
       if (boss && aabbOverlap(boss.getBBox(), player.getBBox())) {
         if (player.takeDamage()) {
+          state.shakeIntensity = 0.13;
           resetStreak();
           audio.playerHit();
           particles.explode(player.mesh.position.x, player.mesh.position.y, 0, 12, 0xffffff);
@@ -171,6 +174,7 @@ function loop(now) {
       if (aabbOverlap({ x: b.mesh.position.x, y: b.mesh.position.y, hw: 0.1, hh: 0.1 }, playerBB)) {
         bullets.recycleBullet(b);
         if (player.takeDamage()) {
+          state.shakeIntensity = 0.13;
           resetStreak();
           audio.playerHit();
           particles.explode(player.mesh.position.x, player.mesh.position.y, 0, 12, 0xffffff);
@@ -190,6 +194,7 @@ function loop(now) {
       if (aabbOverlap(enemies.getBBox(e), playerBB)) {
         enemies.remove(e);
         if (player.takeDamage()) {
+          state.shakeIntensity = 0.13;
           resetStreak();
           audio.playerHit();
           particles.explode(player.mesh.position.x, player.mesh.position.y, 0, 12, 0xffffff);
@@ -213,8 +218,21 @@ function loop(now) {
     }
   }
 
+  // Screen shake
+  if (state.shakeIntensity > 0) {
+    camera.position.x = BASE_CAMERA_X + (Math.random() * 2 - 1) * state.shakeIntensity;
+    camera.position.y = BASE_CAMERA_Y + (Math.random() * 2 - 1) * state.shakeIntensity;
+    state.shakeIntensity *= (1 - dt * 10);
+    if (state.shakeIntensity < 0.005) {
+      state.shakeIntensity = 0;
+      camera.position.x = BASE_CAMERA_X;
+      camera.position.y = BASE_CAMERA_Y;
+    }
+  }
+
   ui.update();
   composer.render();
+  css2dRenderer.render(scene, camera);
 }
 requestAnimationFrame(loop);
 
