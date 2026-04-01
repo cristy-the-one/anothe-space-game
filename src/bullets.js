@@ -2,20 +2,26 @@ import * as THREE from 'three';
 
 const POOL_SIZE = 120;
 
-function makeBulletMesh(color) {
+function makePlayerBulletMesh() {
   return new THREE.Mesh(
     new THREE.BoxGeometry(0.08, 0.08, 0.4),
-    new THREE.MeshBasicMaterial({ color })
+    new THREE.MeshBasicMaterial({ color: 0x00ffff })
+  );
+}
+
+function makeEnemyBulletMesh() {
+  return new THREE.Mesh(
+    new THREE.BoxGeometry(0.15, 0.15, 0.6),
+    new THREE.MeshBasicMaterial({ color: 0xff6600 })
   );
 }
 
 export function createBulletPool(scene) {
-  // Two pools: player bullets (cyan 0x00ffff) and enemy bullets (red 0xff4444)
   const playerPool = Array.from({ length: POOL_SIZE }, () => {
-    const m = makeBulletMesh(0x00ffff); m.visible = false; scene.add(m); return m;
+    const m = makePlayerBulletMesh(); m.visible = false; scene.add(m); return m;
   });
   const enemyPool = Array.from({ length: POOL_SIZE }, () => {
-    const m = makeBulletMesh(0xff4444); m.visible = false; scene.add(m); return m;
+    const m = makeEnemyBulletMesh(); m.visible = false; scene.add(m); return m;
   });
 
   const activeBullets = []; // { mesh, vx, vy, vz, owner: 'player'|'enemy' }
