@@ -129,7 +129,7 @@ function loop(now) {
       // Boss vs player collision
       if (boss && aabbOverlap(boss.getBBox(), player.getBBox())) {
         if (player.takeDamage()) {
-          state.shakeIntensity = 0.13;
+          state.shakeIntensity = 0.83;
           resetStreak();
           audio.playerHit();
           particles.explode(player.mesh.position.x, player.mesh.position.y, 0, 12, 0xffffff);
@@ -174,7 +174,7 @@ function loop(now) {
       if (aabbOverlap({ x: b.mesh.position.x, y: b.mesh.position.y, hw: 0.1, hh: 0.1 }, playerBB)) {
         bullets.recycleBullet(b);
         if (player.takeDamage()) {
-          state.shakeIntensity = 0.13;
+          state.shakeIntensity = 0.33;
           resetStreak();
           audio.playerHit();
           particles.explode(player.mesh.position.x, player.mesh.position.y, 0, 12, 0xffffff);
@@ -194,7 +194,7 @@ function loop(now) {
       if (aabbOverlap(enemies.getBBox(e), playerBB)) {
         enemies.remove(e);
         if (player.takeDamage()) {
-          state.shakeIntensity = 0.13;
+          state.shakeIntensity = 0.63;
           resetStreak();
           audio.playerHit();
           particles.explode(player.mesh.position.x, player.mesh.position.y, 0, 12, 0xffffff);

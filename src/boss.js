@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-const BOSS_HP = [200, 150, 120]; // HP per level
+const BOSS_HP = [150, 120, 100]; // HP per level
 
 function buildBossMesh(levelIdx) {
   const g = new THREE.Group();
