@@ -41,11 +41,34 @@ export function createBulletPool(scene) {
     mesh.visible = true;
     const dx = tx - x, dy = ty - y;
     const len = Math.sqrt(dx * dx + dy * dy) || 1;
-    activeBullets.push({ mesh, vx: (dx / len) * 18, vy: (dy / len) * 18, vz: 5, owner: 'enemy' });
+
+    // Trail: 5-point line, fades from orange at head to black at tail
+    const trailPositions = new Float32Array(5 * 3);
+    const trailColors = new Float32Array(5 * 3);
+    for (let i = 0; i < 5; i++) {
+      trailPositions[i * 3] = x; trailPositions[i * 3 + 1] = y; trailPositions[i * 3 + 2] = 0;
+    }
+    const trailGeo = new THREE.BufferGeometry();
+    trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
+    trailGeo.setAttribute('color', new THREE.BufferAttribute(trailColors, 3));
+    const trailLine = new THREE.Line(trailGeo, new THREE.LineBasicMaterial({ vertexColors: true }));
+    scene.add(trailLine);
+
+    activeBullets.push({
+      mesh, vx: (dx / len) * 18, vy: (dy / len) * 18, vz: 5, owner: 'enemy',
+      trailLine, trailGeo, trailPositions, trailColors,
+    });
   }
 
   function recycleBullet(b) {
     b.mesh.visible = false;
+    if (b.trailLine) {
+      scene.remove(b.trailLine);
+      b.trailGeo.dispose();
+      b.trailLine.material.dispose();
+      b.trailLine = null;
+      b.trailGeo = null;
+    }
     const idx = activeBullets.indexOf(b);
     if (idx !== -1) activeBullets.splice(idx, 1);
   }
@@ -62,7 +85,31 @@ export function createBulletPool(scene) {
         b.mesh.position.x += b.vx * dt;
         b.mesh.position.y += b.vy * dt;
         b.mesh.position.z += b.vz * dt;
-        // Remove if out of range
+
+        if (b.owner === 'enemy' && b.trailLine) {
+          const tp = b.trailPositions;
+          const tc = b.trailColors;
+          // Shift positions toward tail (index 4 is oldest)
+          for (let j = 4; j > 0; j--) {
+            tp[j * 3]     = tp[(j - 1) * 3];
+            tp[j * 3 + 1] = tp[(j - 1) * 3 + 1];
+            tp[j * 3 + 2] = tp[(j - 1) * 3 + 2];
+          }
+          // Head = current bullet position
+          tp[0] = b.mesh.position.x;
+          tp[1] = b.mesh.position.y;
+          tp[2] = b.mesh.position.z;
+          // Colors: orange at head, black at tail
+          for (let j = 0; j < 5; j++) {
+            const t = 1 - j / 4;
+            tc[j * 3]     = t * (0xff / 255); // R
+            tc[j * 3 + 1] = t * (0x66 / 255); // G
+            tc[j * 3 + 2] = 0;                 // B
+          }
+          b.trailGeo.attributes.position.needsUpdate = true;
+          b.trailGeo.attributes.color.needsUpdate = true;
+        }
+
         if (b.mesh.position.z < -80 || b.mesh.position.z > 10 ||
             Math.abs(b.mesh.position.x) > 20 || Math.abs(b.mesh.position.y) > 15) {
           recycleBullet(b);
@@ -71,9 +118,14 @@ export function createBulletPool(scene) {
     },
 
     clear() {
-      // Positions are reset at spawn time — only hide and drain the active list
       for (let i = activeBullets.length - 1; i >= 0; i--) {
-        activeBullets[i].mesh.visible = false;
+        const b = activeBullets[i];
+        b.mesh.visible = false;
+        if (b.trailLine) {
+          scene.remove(b.trailLine);
+          b.trailGeo.dispose();
+          b.trailLine.material.dispose();
+        }
       }
       activeBullets.length = 0;
     },
