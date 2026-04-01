@@ -20,6 +20,7 @@ export const state = {
   invincibleUntil: 0,
   activePowerUps: {}, // { spreadShot: expiry_ms, rapidFire: expiry_ms, shield: true, speedBoost: expiry_ms }
   hasBomb: false,
+  shakeIntensity: 0,
 };
 
 export function resetForNewGame() {
@@ -35,4 +36,5 @@ export function resetForNewGame() {
   state.invincibleUntil = 0;
   state.activePowerUps = {};
   state.hasBomb = false;
+  state.shakeIntensity = 0;
 }

@@ -1,6 +1,6 @@
 await new Promise(r => setTimeout(r, 50));
 import { calcMultiplier, addKill } from '../src/score.js';
-import { state } from '../src/state.js';
+import { state, resetForNewGame } from '../src/state.js';
 
 describe('Score Multiplier');
 // After 0-4 kills, multiplier stays x1
@@ -29,3 +29,9 @@ state.lastKillTime = 0;
 state.multiplier = 1;
 addKill('kamikaze', Date.now());
 assert('addKill awards kamikaze points (50)', state.score === 50);
+
+describe('state.shakeIntensity');
+assert('initializes to 0', state.shakeIntensity === 0);
+state.shakeIntensity = 0.5;
+resetForNewGame();
+assert('resetForNewGame resets shakeIntensity to 0', state.shakeIntensity === 0);
