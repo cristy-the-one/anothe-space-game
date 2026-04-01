@@ -48,6 +48,13 @@ export function createBulletPool(scene) {
     for (let i = 0; i < 5; i++) {
       trailPositions[i * 3] = x; trailPositions[i * 3 + 1] = y; trailPositions[i * 3 + 2] = 0;
     }
+    // Precompute trail colors once: orange at head, black at tail
+    for (let i = 0; i < 5; i++) {
+      const t = 1 - i / 4;
+      trailColors[i * 3]     = t * (0xff / 255);
+      trailColors[i * 3 + 1] = t * (0x66 / 255);
+      trailColors[i * 3 + 2] = 0;
+    }
     const trailGeo = new THREE.BufferGeometry();
     trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
     trailGeo.setAttribute('color', new THREE.BufferAttribute(trailColors, 3));
@@ -99,15 +106,7 @@ export function createBulletPool(scene) {
           tp[0] = b.mesh.position.x;
           tp[1] = b.mesh.position.y;
           tp[2] = b.mesh.position.z;
-          // Colors: orange at head, black at tail
-          for (let j = 0; j < 5; j++) {
-            const t = 1 - j / 4;
-            tc[j * 3]     = t * (0xff / 255); // R
-            tc[j * 3 + 1] = t * (0x66 / 255); // G
-            tc[j * 3 + 2] = 0;                 // B
-          }
           b.trailGeo.attributes.position.needsUpdate = true;
-          b.trailGeo.attributes.color.needsUpdate = true;
         }
 
         if (b.mesh.position.z < -80 || b.mesh.position.z > 10 ||
