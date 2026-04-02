@@ -63,20 +63,28 @@ export function createPlayer(scene) {
 
   // Touch: primary finger moves + auto-fires; second finger triggers bomb flag
   const shooting = { active: false, bombRequested: false };
+  let touchDragOffset = { x: 0, y: 0 };
 
   document.addEventListener('touchstart', e => {
     e.preventDefault();
     useMouseMove = true;
     shooting.active = true;
     const t = e.touches[0];
-    Object.assign(mouseTarget, clientToGame(t.clientX, t.clientY));
+    const gamePos = clientToGame(t.clientX, t.clientY);
+    // Record offset so ship doesn't snap to finger — it stays where it is relative to touch point
+    touchDragOffset.x = mesh.position.x - gamePos.x;
+    touchDragOffset.y = mesh.position.y - gamePos.y;
+    mouseTarget.x = mesh.position.x;
+    mouseTarget.y = mesh.position.y;
     if (e.touches.length >= 2) shooting.bombRequested = true;
   }, { passive: false });
 
   document.addEventListener('touchmove', e => {
     e.preventDefault();
     const t = e.touches[0];
-    Object.assign(mouseTarget, clientToGame(t.clientX, t.clientY));
+    const gamePos = clientToGame(t.clientX, t.clientY);
+    mouseTarget.x = gamePos.x + touchDragOffset.x;
+    mouseTarget.y = gamePos.y + touchDragOffset.y;
   }, { passive: false });
 
   document.addEventListener('touchend', e => {
